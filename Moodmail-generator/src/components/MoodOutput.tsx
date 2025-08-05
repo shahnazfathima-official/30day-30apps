@@ -13,6 +13,7 @@ const MoodOutput = ({subject, footer, onReset}: Props) => {
   const handleCopy = () => {
     const text = `Subject: ${subject}\nFooter: ${footer}`;
     navigator.clipboard.writeText(text);
+    alert("Subject and footer copied");
   };
   return (
     <div>
