@@ -31,9 +31,8 @@ const getMoveFromDeepseek = async()=>{
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions",{
         method: "POST",
         headers:{
-             //Authorization: `Bearer ${import.meta.VITE_OPENROUTER_API_KEY}`,
-            // Authorization: `Bearer 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`,
-            Authorization: `Bearer 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`,
+            
+            Authorization: `Bearer sk-or-v*******************************`,
 
             "Content-Type":"application/json"
         },
