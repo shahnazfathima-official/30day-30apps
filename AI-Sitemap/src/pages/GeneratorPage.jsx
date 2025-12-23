@@ -39,7 +39,7 @@ const GeneratorPage = () => {
       method: "POST",
       headers: {
         Authorization:
-          "Bearer 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",
+          "Bearer sk-or-v1-22e01c*****************************",
         // "HTTP-Referer": "<YOUR_SITE_URL>", // Optional. Site URL for rankings on openrouter.ai.
         // "X-Title": "<YOUR_SITE_NAME>", // Optional. Site title for rankings on openrouter.ai.
         "Content-Type": "application/json",
