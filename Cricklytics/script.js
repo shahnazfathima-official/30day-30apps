@@ -1,6 +1,18 @@
 const API_KEY = "f2bd4dab-38b1-4b7a-8de1-d456692a88e2";
 const BASE_URL = "https://api.cricapi.com/v1";
 
+// Show API Limit Modal
+function showApiLimitModal() {
+  const modal = document.getElementById("apiLimitModal");
+  modal.classList.remove("hidden");
+}
+
+// Close API Limit Modal
+function closeApiLimitModal() {
+  const modal = document.getElementById("apiLimitModal");
+  modal.classList.add("hidden");
+}
+
 //Realtime search players
 
 async function searchPlayers(query, dropdown) {
@@ -11,6 +23,17 @@ async function searchPlayers(query, dropdown) {
       `${BASE_URL}/players?apikey=${API_KEY}&search=${query}`
     );
     const result = await res.json();
+
+    // Check if API limit exceeded
+    if (
+      result.status === "failure" ||
+      result.status === 429 ||
+      (result.info && result.info.includes("API limit"))
+    ) {
+      showApiLimitModal();
+      dropdown.innerHTML = '<option value="">Select Player</option>';
+      return;
+    }
 
     dropdown.innerHTML = '<option value="">Select Player</option>';
 
