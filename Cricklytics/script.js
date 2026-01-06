@@ -1,4 +1,4 @@
-const API_KEY = "f2bd4dab-38b1-4b7a-8de1-d456692a88e2";
+const API_KEY = "83f59d35-a0ac-4610-866a-9081e34aed21";
 const BASE_URL = "https://api.cricapi.com/v1";
 
 // Show API Limit Modal
