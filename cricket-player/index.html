@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cricket Player Comparison Tool</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>Cricket Player Comparison Tool</h1>
+
+    <div class="selection">
+      <div>
+        <input type="text" id="search1" placeholder="Search player..." />
+        <select id="player1"></select>
+      </div>
+
+      <div>
+        <input type="text" id="search2" placeholder="Search player..." />
+        <select id="player2"></select>
+      </div>
+    </div>
+    <button id="compareBtn">Compare</button>
+    <p id="errorMsg" style="color: red; font-weight: bold;"></p>
+
+    <table id="comparison"></table>
+
+    <script src="script.js"></script>
+
+  </body>
+</html>

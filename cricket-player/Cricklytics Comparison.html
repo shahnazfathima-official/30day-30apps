@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cricklytics - Compare Cricket Players</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(
+          135deg,
+          #0a3d4a 0%,
+          #1a5a6b 50%,
+          #0d4a5c 100%
+        );
+        min-height: 100vh;
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      /* Stadium background */
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url("stadium.png");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        z-index: -1;
+        pointer-events: none;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 120px 20px 40px 20px;
+      }
+
+      /* Cricklytics Logo */
+      .logo {
+        position: absolute;
+        top: 20px;
+        left: 24px;
+        text-align: left;
+        font-size: 32px;
+        font-weight: bold;
+        color: #ffffff;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        z-index: 20;
+      }
+
+      .logo::before {
+        content: "🏏 ";
+        margin-right: 10px;
+      }
+
+      /* Header with logo image and green app name */
+      .site-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 80px;
+        background-color: #ffffff;
+        display: flex;
+        align-items: center;
+        padding: 0 24px;
+        gap: 12px;
+        z-index: 100;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .site-logo-img {
+        height: 56px;
+        width: auto;
+        display: block;
+      }
+
+      .site-logo-text {
+        color: #1a9b8e;
+        font-size: 36px;
+        font-weight: 800;
+        font-style: normal;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+      }
+
+      /* Main Title */
+      h1 {
+        text-align: center;
+        color: #ffffff;
+        font-size: 48px;
+        margin-bottom: 40px;
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
+        font-style: italic;
+      }
+
+      /* Players Container */
+      .players-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-bottom: 40px;
+        align-items: start;
+      }
+
+      .player-select {
+        background: rgba(0, 0, 0, 0.4);
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        border: 2px solid rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+      }
+
+      .player-info {
+        flex: 1;
+      }
+
+      .player-avatar {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        border: 4px solid #1a9b8e;
+        box-shadow: 0 0 28px rgba(26, 155, 142, 0.7),
+          inset 0 0 24px rgba(26, 155, 142, 0.35);
+        object-fit: cover;
+        flex-shrink: 0;
+      }
+
+      .player-select label {
+        display: block;
+        color: #ffffff;
+        font-weight: 500;
+        margin-bottom: 12px;
+        font-size: 14px;
+      }
+
+      .search-box {
+        position: relative;
+        margin-bottom: 12px;
+      }
+
+      .search-input {
+        width: 100%;
+        padding: 12px 40px 12px 12px;
+        border: 2px solid #0a3d4a;
+        border-radius: 8px;
+        font-size: 16px;
+        background: #ffffff;
+        color: #1a1a1a;
+      }
+
+      .search-input:focus {
+        outline: none;
+        border-color: #1a9b8e;
+        box-shadow: 0 0 0 3px rgba(26, 155, 142, 0.1);
+      }
+
+      .search-icon {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #0a3d4a;
+        font-size: 16px;
+      }
+
+      .player-select select {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #0a3d4a;
+        border-radius: 8px;
+        font-size: 16px;
+        background: #ffffff;
+        color: #1a1a1a;
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230a3d4a' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        padding-right: 40px;
+      }
+
+      .player-select select:focus {
+        outline: none;
+        border-color: #1a9b8e;
+        box-shadow: 0 0 0 3px rgba(26, 155, 142, 0.1);
+      }
+
+      /* Player Avatar */
+      .player-avatar {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        margin: 0;
+        object-fit: cover;
+        border: 4px solid #0a3d4a;
+      }
+
+      /* Compare Button */
+      .button-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 40px;
+        grid-column: 1 / -1;
+      }
+
+      .compare-btn {
+        background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+        color: white;
+        padding: 16px 50px;
+        border: none;
+        border-radius: 8px;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .compare-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+        background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+      }
+
+      .compare-btn:active {
+        transform: translateY(0);
+      }
+
+      /* Comparison Table */
+      .comparison-section {
+        background: rgba(0, 0, 0, 0.5);
+        padding: 30px;
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        margin-top: 15px;
+      }
+
+      .comparison-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+
+      .comparison-table th {
+        background: linear-gradient(90deg, #0a3d4a 0%, #1a5a6b 100%);
+        color: #ffffff;
+        padding: 16px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 18px;
+        border-bottom: 3px solid #1a9b8e;
+      }
+
+      .comparison-table td {
+        padding: 14px 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        color: #ffffff;
+        font-size: 17px;
+      }
+
+      .comparison-table tr:hover {
+        background-color: rgba(26, 155, 142, 0.15);
+      }
+
+      .comparison-table tr:last-child td {
+        border-bottom: none;
+      }
+
+      .stat-label {
+        color: #ccffff;
+        font-weight: 600;
+        min-width: 150px;
+      }
+
+      .highest-value {
+        background-color: rgba(76, 175, 80, 0.5) !important;
+        font-weight: 600;
+      }
+
+      /* Cricket bat decoration */
+      .cricket-bat {
+        position: absolute;
+        left: -100px;
+        bottom: 50px;
+        width: 200px;
+        height: 40px;
+        background: linear-gradient(90deg, #8b4513 0%, #a0522d 100%);
+        border-radius: 50%;
+        opacity: 0.3;
+        transform: rotate(-45deg);
+        pointer-events: none;
+      }
+
+      /* Cricket ball decoration */
+      .cricket-ball {
+        position: absolute;
+        right: -50px;
+        top: 200px;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 30%, #ff6b6b, #c92a2a);
+        box-shadow: inset -2px -2px 5px rgba(0, 0, 0, 0.3);
+        opacity: 0.2;
+        pointer-events: none;
+      }
+
+      .cricket-ball::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 60%;
+        height: 60%;
+        transform: translate(-50%, -50%);
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        border-radius: 50%;
+      }
+
+      @media (max-width: 768px) {
+        .players-container {
+          grid-template-columns: 1fr;
+          gap: 20px;
+        }
+
+        h1 {
+          font-size: 32px;
+        }
+
+        .comparison-table {
+          font-size: 12px;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+          padding: 10px 8px;
+        }
+      }
+
+      /* Loading animation */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .comparison-section {
+        animation: fadeIn 0.5s ease-out;
+      }
+
+      
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="cricket-bat"></div>
+    <div class="cricket-ball"></div>
+
+    <header class="site-header">
+      <img src="logo.PNG" alt="Cricklytics logo" class="site-logo-img" />
+      <div class="site-logo-text">Cricklytics</div>
+    </header>
+
+    <div class="container">
+      <h1>Compare Cricket Players</h1>
+
+      <div class="players-container">
+        <div class="player-select">
+          <img
+            id="player1Avatar"
+            class="player-avatar"
+            src="jersey.png"
+            alt="Player 1"
+          />
+          <div class="player-info">
+            <label>Player 1</label>
+            <div class="search-box">
+              <input
+                type="text"
+                id="search1"
+                class="search-input"
+                placeholder="Search player..."
+              />
+              <span class="search-icon">🔍</span>
+            </div>
+            <select id="player1">
+              <option value="">Select Player 1</option>
+              <option value="sachin">Sachin Tendulkar</option>
+              <option value="dhoni">MS Dhoni</option>
+              <option value="virat">Virat Kohli</option>
+              <option value="warner">David Warner</option>
+              <option value="smith">Steve Smith</option>
+              <option value="kane">Kane Williamson</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="player-select">
+          <img
+            id="player2Avatar"
+            class="player-avatar"
+            src="jersey.png"
+            alt="Player 2"
+          />
+          <div class="player-info">
+            <label>Player 2</label>
+            <div class="search-box">
+              <input
+                type="text"
+                id="search2"
+                class="search-input"
+                placeholder="Search player..."
+              />
+              <span class="search-icon">🔍</span>
+            </div>
+            <select id="player2">
+              <option value="">Select Player 2</option>
+              <option value="sachin">Sachin Tendulkar</option>
+              <option value="dhoni">MS Dhoni</option>
+              <option value="virat">Virat Kohli</option>
+              <option value="warner">David Warner</option>
+              <option value="smith">Steve Smith</option>
+              <option value="kane">Kane Williamson</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="button-container" style="grid-column: 1 / -1">
+          <button class="compare-btn" onclick="comparePlayers()">
+            Compare
+          </button>
+        </div>
+      </div>
+
+      <div id="comparisonResult" class="comparison-section hidden">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Statistic</th>
+              <th id="player1Name">Player 1</th>
+              <th id="player2Name">Player 2</th>
+            </tr>
+          </thead>
+          <tbody id="statsBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      const playerData = {
+        sachin: {
+          name: "Sachin Tendulkar",
+          matches: 200,
+          runs: 15921,
+          average: 53.79,
+          centuries: 51,
+          halfCenturies: 68,
+          highestScore: 248,
+          image: "https://via.placeholder.com/100?text=Sachin",
+        },
+        dhoni: {
+          name: "MS Dhoni",
+          matches: 90,
+          runs: 4876,
+          average: 38.09,
+          centuries: 6,
+          halfCenturies: 33,
+          highestScore: 224,
+          image: "https://via.placeholder.com/100?text=Dhoni",
+        },
+        virat: {
+          name: "Virat Kohli",
+          matches: 185,
+          runs: 14848,
+          average: 55.72,
+          centuries: 47,
+          halfCenturies: 68,
+          highestScore: 183,
+          image: "https://via.placeholder.com/100?text=Virat",
+        },
+        warner: {
+          name: "David Warner",
+          matches: 178,
+          runs: 12500,
+          average: 48.25,
+          centuries: 33,
+          halfCenturies: 58,
+          highestScore: 179,
+          image: "https://via.placeholder.com/100?text=Warner",
+        },
+        smith: {
+          name: "Steve Smith",
+          matches: 160,
+          runs: 13455,
+          average: 61.16,
+          centuries: 42,
+          halfCenturies: 55,
+          highestScore: 214,
+          image: "https://via.placeholder.com/100?text=Smith",
+        },
+        kane: {
+          name: "Kane Williamson",
+          matches: 152,
+          runs: 12650,
+          average: 57.5,
+          centuries: 40,
+          halfCenturies: 59,
+          highestScore: 238,
+          image: "https://via.placeholder.com/100?text=Kane",
+        },
+      };
+
+      const stats = [
+        "matches",
+        "runs",
+        "average",
+        "centuries",
+        "halfCenturies",
+        "highestScore",
+      ];
+      const statLabels = {
+        matches: "Matches",
+        runs: "Runs",
+        average: "Average",
+        centuries: "Centuries",
+        halfCenturies: "Half Centuries",
+        highestScore: "Highest Score",
+      };
+
+      function comparePlayers() {
+        const player1Val = document.getElementById("player1").value;
+        const player2Val = document.getElementById("player2").value;
+
+        if (!player1Val || !player2Val) {
+          alert("Please select both players");
+          return;
+        }
+
+        const player1 = playerData[player1Val];
+        const player2 = playerData[player2Val];
+
+        document.getElementById("player1Name").textContent = player1.name;
+        document.getElementById("player2Name").textContent = player2.name;
+
+        const statsBody = document.getElementById("statsBody");
+        statsBody.innerHTML = "";
+
+        stats.forEach((stat) => {
+          const row = document.createElement("tr");
+          const val1 = player1[stat];
+          const val2 = player2[stat];
+
+          const cell1Class = val1 > val2 ? "highest-value" : "";
+          const cell2Class = val2 > val1 ? "highest-value" : "";
+
+          row.innerHTML = `
+                    <td class="stat-label">${statLabels[stat]}</td>
+                    <td class="${cell1Class}">${val1}</td>
+                    <td class="${cell2Class}">${val2}</td>
+                `;
+          statsBody.appendChild(row);
+        });
+
+        document.getElementById("comparisonResult").classList.remove("hidden");
+      }
+
+      // Search functionality
+      document.getElementById("search1").addEventListener("keyup", function () {
+        filterPlayers(this.value, "player1");
+      });
+
+      document.getElementById("search2").addEventListener("keyup", function () {
+        filterPlayers(this.value, "player2");
+      });
+
+      // Show selected player name in search box
+      document
+        .getElementById("player1")
+        .addEventListener("change", function () {
+          const playerVal = this.value;
+          if (playerVal && playerData[playerVal]) {
+            document.getElementById("search1").value =
+              playerData[playerVal].name;
+          } else {
+            document.getElementById("search1").value = "";
+          }
+        });
+
+      document
+        .getElementById("player2")
+        .addEventListener("change", function () {
+          const playerVal = this.value;
+          if (playerVal && playerData[playerVal]) {
+            document.getElementById("search2").value =
+              playerData[playerVal].name;
+          } else {
+            document.getElementById("search2").value = "";
+          }
+        });
+
+      function filterPlayers(searchTerm, selectId) {
+        const select = document.getElementById(selectId);
+        const options = select.querySelectorAll("option");
+        const lowerSearch = searchTerm.toLowerCase();
+
+        options.forEach((option) => {
+          if (option.value === "") {
+            option.style.display = "block";
+          } else {
+            const playerName = playerData[option.value].name.toLowerCase();
+            option.style.display = playerName.includes(lowerSearch)
+              ? "block"
+              : "none";
+          }
+        });
+      }
+
+      // Enter key to compare
+      document.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          comparePlayers();
+        }
+      });
+    </script>
+  </body>
+</html>
