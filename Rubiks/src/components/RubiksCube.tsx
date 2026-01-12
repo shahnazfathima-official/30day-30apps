@@ -200,9 +200,10 @@ const RubiksCube = () => {
     return () => {
       window.removeEventListener("resize", handleResize);
       if (renderer.domElement) {
-        renderer.domElement.removeEventListener("mousedown", onMouseDown);
-        renderer.domElement.removeEventListener("mousemove", onMouseMove);
-        renderer.domElement.removeEventListener("mouseup", onMouseUp);
+        renderer.domElement.removeEventListener("pointerdown", onPointerDown);
+        renderer.domElement.removeEventListener("pointermove", onPointerMove);
+        renderer.domElement.removeEventListener("pointerup", onPointerUp);
+        renderer.domElement.removeEventListener("pointerleave", onPointerUp);
       }
       if (mountRef.current && renderer.domElement) {
         mountRef.current.removeChild(renderer.domElement);
