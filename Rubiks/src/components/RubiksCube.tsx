@@ -60,7 +60,7 @@ const RubiksCube = () => {
     scene.add(directionalLight);
 
     // Create cubes
-    const cubeSize = 1.5;
+    const cubeSize = 0.95;
     const gap = 0.05;
     const offset = cubeSize + gap;
     const cubes = [];
@@ -131,12 +131,7 @@ const RubiksCube = () => {
     //   camera.position.setFromSpherical(spherical);
     //   camera.lookAt(0, 0, 0);
 
-    //   previousMouseRef.current = { x: e.clientX, y: e.clientY };
-    // };
-
-    // const onMouseUp = () => {
-    //   isDraggingRef.current = false;
-    // };
+    //
 
     const onPointerDown = (e: PointerEvent) => {
       isDraggingRef.current = true;
