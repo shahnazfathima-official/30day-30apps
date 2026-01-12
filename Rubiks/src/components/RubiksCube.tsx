@@ -60,7 +60,7 @@ const RubiksCube = () => {
     scene.add(directionalLight);
 
     // Create cubes
-    const cubeSize = 0.95;
+    const cubeSize = 1.5;
     const gap = 0.05;
     const offset = cubeSize + gap;
     const cubes = [];
@@ -106,13 +106,44 @@ const RubiksCube = () => {
     }
     cubesRef.current = cubes;
 
-    // Mouse controls for camera rotation
-    const onMouseDown = (e: MouseEvent) => {
+    // // Mouse controls for camera rotation
+    // const onMouseDown = (e: MouseEvent) => {
+    //   isDraggingRef.current = true;
+    //   previousMouseRef.current = { x: e.clientX, y: e.clientY };
+    // };
+
+    // const onMouseMove = (e: MouseEvent) => {
+    //   if (!isDraggingRef.current || isAnimating) return;
+
+    //   const deltaX = e.clientX - previousMouseRef.current.x;
+    //   const deltaY = e.clientY - previousMouseRef.current.y;
+
+    //   const rotationSpeed = 0.005;
+
+    //   // Rotate camera around the cube
+    //   const spherical = new THREE.Spherical();
+    //   spherical.setFromVector3(camera.position);
+
+    //   spherical.theta -= deltaX * rotationSpeed;
+    //   spherical.phi += deltaY * rotationSpeed;
+    //   spherical.phi = Math.max(0.1, Math.min(Math.PI - 0.1, spherical.phi));
+
+    //   camera.position.setFromSpherical(spherical);
+    //   camera.lookAt(0, 0, 0);
+
+    //   previousMouseRef.current = { x: e.clientX, y: e.clientY };
+    // };
+
+    // const onMouseUp = () => {
+    //   isDraggingRef.current = false;
+    // };
+
+    const onPointerDown = (e: PointerEvent) => {
       isDraggingRef.current = true;
       previousMouseRef.current = { x: e.clientX, y: e.clientY };
     };
 
-    const onMouseMove = (e: MouseEvent) => {
+    const onPointerMove = (e: PointerEvent) => {
       if (!isDraggingRef.current || isAnimating) return;
 
       const deltaX = e.clientX - previousMouseRef.current.x;
@@ -120,27 +151,31 @@ const RubiksCube = () => {
 
       const rotationSpeed = 0.005;
 
-      // Rotate camera around the cube
       const spherical = new THREE.Spherical();
-      spherical.setFromVector3(camera.position);
+      spherical.setFromVector3(cameraRef.current!.position);
 
       spherical.theta -= deltaX * rotationSpeed;
       spherical.phi += deltaY * rotationSpeed;
       spherical.phi = Math.max(0.1, Math.min(Math.PI - 0.1, spherical.phi));
 
-      camera.position.setFromSpherical(spherical);
-      camera.lookAt(0, 0, 0);
+      cameraRef.current!.position.setFromSpherical(spherical);
+      cameraRef.current!.lookAt(0, 0, 0);
 
       previousMouseRef.current = { x: e.clientX, y: e.clientY };
     };
 
-    const onMouseUp = () => {
+    const onPointerUp = () => {
       isDraggingRef.current = false;
     };
 
-    renderer.domElement.addEventListener("mousedown", onMouseDown);
-    renderer.domElement.addEventListener("mousemove", onMouseMove);
-    renderer.domElement.addEventListener("mouseup", onMouseUp);
+    // renderer.domElement.addEventListener("mousedown", onMouseDown);
+    // renderer.domElement.addEventListener("mousemove", onMouseMove);
+    // renderer.domElement.addEventListener("mouseup", onMouseUp);
+
+    renderer.domElement.addEventListener("pointerdown", onPointerDown);
+    renderer.domElement.addEventListener("pointermove", onPointerMove);
+    renderer.domElement.addEventListener("pointerup", onPointerUp);
+    renderer.domElement.addEventListener("pointerleave", onPointerUp);
 
     // Animation loop
     const animate = () => {
