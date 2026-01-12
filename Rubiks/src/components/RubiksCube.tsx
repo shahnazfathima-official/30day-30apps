@@ -5,7 +5,7 @@ const RubiksCube = () => {
   const mountRef = useRef(null);
   const [scrambleCount, setScrambleCount] = useState(20);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [moveHistory, setMoveHistory] = useState([]);
+  const [moveHistory, setMoveHistory] = useState<string[]>([]);
   const [userMoveHistory, setUserMoveHistory] = useState([]);
   const sceneRef = useRef(null);
   const cameraRef = useRef(null);
@@ -274,7 +274,7 @@ const RubiksCube = () => {
     }
   };
 
-  const handleManualMove = async (move) => {
+  const handleManualMove = async (move:string) => {
     if (isAnimating) return;
     setIsAnimating(true);
     await executeMove(move);
@@ -287,21 +287,13 @@ const RubiksCube = () => {
     if (isAnimating) return;
     setIsAnimating(true);
 
-    const possibleMoves = [
-      "R",
-      "R'",
-      "L",
-      "L'",
-      "U",
-      "U'",
-      "D",
-      "D'",
-      "F",
-      "F'",
-      "B",
-      "B'",
-    ];
-    const scrambleMoves = [];
+   const possibleMoves: string[] = [
+  'R',"R'",'L',"L'",
+  'U',"U'",'D',"D'",
+  'F',"F'",'B',"B'"
+];
+
+    const scrambleMoves:string[] = [];
 
     for (let i = 0; i < scrambleCount; i++) {
       const randomMove =
