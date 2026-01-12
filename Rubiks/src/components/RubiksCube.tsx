@@ -1,17 +1,17 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 
 const RubiksCube = () => {
-  const mountRef = useRef(null);
+  const mountRef = useRef<HTMLDivElement>(null);
   const [scrambleCount, setScrambleCount] = useState(20);
   const [isAnimating, setIsAnimating] = useState(false);
   const [moveHistory, setMoveHistory] = useState<string[]>([]);
-  const [userMoveHistory, setUserMoveHistory] = useState([]);
-  const sceneRef = useRef(null);
-  const cameraRef = useRef(null);
-  const rendererRef = useRef(null);
-  const cubesRef = useRef([]);
-  const rotationGroupRef = useRef(null);
+  const [userMoveHistory, setUserMoveHistory] = useState<string[]>([]);
+  const sceneRef = useRef<THREE.Scene | null>(null);
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
+  const cubesRef = useRef<THREE.Mesh[]>([]);
+  const rotationGroupRef = useRef<THREE.Group | null>(null);
   const isDraggingRef = useRef(false);
   const previousMouseRef = useRef({ x: 0, y: 0 });
 
@@ -107,12 +107,12 @@ const RubiksCube = () => {
     cubesRef.current = cubes;
 
     // Mouse controls for camera rotation
-    const onMouseDown = (e) => {
+    const onMouseDown = (e: MouseEvent) => {
       isDraggingRef.current = true;
       previousMouseRef.current = { x: e.clientX, y: e.clientY };
     };
 
-    const onMouseMove = (e) => {
+    const onMouseMove = (e: MouseEvent) => {
       if (!isDraggingRef.current || isAnimating) return;
 
       const deltaX = e.clientX - previousMouseRef.current.x;
@@ -175,8 +175,13 @@ const RubiksCube = () => {
     };
   }, []);
 
-  const rotateFace = (axis, layer, direction, duration = 300) => {
-    return new Promise((resolve) => {
+  const rotateFace = (
+    axis: string,
+    layer: number,
+    direction: number,
+    duration = 300
+  ): Promise<void> => {
+    return new Promise<void>((resolve) => {
       if (!sceneRef.current) {
         resolve();
         return;
@@ -201,7 +206,7 @@ const RubiksCube = () => {
       });
 
       // Animate rotation
-      const startRotation = group.rotation[axis];
+      const startRotation: number = group.rotation[axis as "x" | "y" | "z"];
       const endRotation = startRotation + (Math.PI / 2) * direction;
       const startTime = Date.now();
 
@@ -215,7 +220,7 @@ const RubiksCube = () => {
             ? 2 * progress * progress
             : 1 - Math.pow(-2 * progress + 2, 2) / 2;
 
-        group.rotation[axis] =
+        group.rotation[axis as "x" | "y" | "z"] =
           startRotation + (endRotation - startRotation) * easeProgress;
 
         if (progress < 1) {
@@ -223,7 +228,7 @@ const RubiksCube = () => {
         } else {
           // Detach cubes from group and update positions
           cubesToRotate.forEach((cube) => {
-            sceneRef.current.attach(cube);
+            sceneRef.current?.attach(cube);
 
             // Update grid position
             const pos = cube.position;
@@ -243,7 +248,7 @@ const RubiksCube = () => {
             );
           });
 
-          sceneRef.current.remove(group);
+          sceneRef.current?.remove(group);
           rotationGroupRef.current = null;
           resolve();
         }
@@ -253,7 +258,7 @@ const RubiksCube = () => {
     });
   };
 
-  const executeMove = async (move) => {
+  const executeMove = async (move: string) => {
     const moves = {
       R: () => rotateFace("x", 1, 1),
       "R'": () => rotateFace("x", 1, -1),
@@ -269,17 +274,17 @@ const RubiksCube = () => {
       "B'": () => rotateFace("z", -1, 1),
     };
 
-    if (moves[move]) {
-      await moves[move]();
+    if (moves[move as keyof typeof moves]) {
+      await moves[move as keyof typeof moves]();
     }
   };
 
-  const handleManualMove = async (move:string) => {
+  const handleManualMove = async (move: string) => {
     if (isAnimating) return;
     setIsAnimating(true);
     await executeMove(move);
-    setMoveHistory((prev) => [...prev, move]);
-    setUserMoveHistory((prev) => [...prev, move]);
+    setMoveHistory((prev: string[]) => [...prev, move]);
+    setUserMoveHistory((prev: string[]) => [...prev, move]);
     setIsAnimating(false);
   };
 
@@ -287,13 +292,22 @@ const RubiksCube = () => {
     if (isAnimating) return;
     setIsAnimating(true);
 
-   const possibleMoves: string[] = [
-  'R',"R'",'L',"L'",
-  'U',"U'",'D',"D'",
-  'F',"F'",'B',"B'"
-];
+    const possibleMoves: string[] = [
+      "R",
+      "R'",
+      "L",
+      "L'",
+      "U",
+      "U'",
+      "D",
+      "D'",
+      "F",
+      "F'",
+      "B",
+      "B'",
+    ];
 
-    const scrambleMoves:string[] = [];
+    const scrambleMoves: string[] = [];
 
     for (let i = 0; i < scrambleCount; i++) {
       const randomMove =
@@ -302,7 +316,7 @@ const RubiksCube = () => {
       await executeMove(randomMove);
     }
 
-    setMoveHistory((prev) => [...prev, ...scrambleMoves]);
+    setMoveHistory((prev: string[]) => [...prev, ...scrambleMoves]);
     setIsAnimating(false);
   };
 
@@ -327,7 +341,9 @@ const RubiksCube = () => {
     };
 
     for (let i = moveHistory.length - 1; i >= 0; i--) {
-      await executeMove(inverseMoves[moveHistory[i]]);
+      await executeMove(
+        inverseMoves[moveHistory[i] as keyof typeof inverseMoves]
+      );
     }
 
     setMoveHistory([]);
@@ -356,13 +372,15 @@ const RubiksCube = () => {
     };
 
     for (let i = userMoveHistory.length - 1; i >= 0; i--) {
-      await executeMove(inverseMoves[userMoveHistory[i]]);
+      await executeMove(
+        inverseMoves[userMoveHistory[i] as keyof typeof inverseMoves]
+      );
     }
 
-    setMoveHistory((prev) =>
+    setMoveHistory((prev: string[]) =>
       prev.filter(
-        (_, index) =>
-          !userMoveHistory.includes(_) ||
+        (item, index) =>
+          !userMoveHistory.includes(item) ||
           index < prev.length - userMoveHistory.length
       )
     );
